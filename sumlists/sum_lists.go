@@ -10,12 +10,11 @@ type IntLink struct {
 	Next  *IntLink
 }
 
-type IntLinkedListSupervisor struct {
-	Tail   *IntLink
-	Length int
+type IntLinkedList struct {
+	Tail *IntLink
 }
 
-func (ll *IntLinkedListSupervisor) String() string {
+func (ll *IntLinkedList) String() string {
 
 	link := ll.Tail
 	outString := "Output: ("
@@ -28,9 +27,9 @@ func (ll *IntLinkedListSupervisor) String() string {
 	return outString
 }
 
-func NewIntLinkedList(inputs ...int) *IntLinkedListSupervisor {
+func NewIntLinkedList(inputs ...int) *IntLinkedList {
 
-	ll := IntLinkedListSupervisor{}
+	ll := IntLinkedList{}
 	var lastNode *IntLink
 
 	for _, input := range inputs {
@@ -50,7 +49,38 @@ func NewIntLinkedList(inputs ...int) *IntLinkedListSupervisor {
 	return &ll
 }
 
-func SumLists(inputs ...*IntLinkedListSupervisor) *IntLinkedListSupervisor {
+const (
+	Forwards = iota
+	Backwards
+)
+
+func intToDigitSlice(input int, direction int) []int {
+
+	digitLength := int(math.Ceil(math.Log10(float64(input + 1))))
+	digits := make([]int, digitLength)
+
+	i := 0
+	if direction == Backwards {
+		i = digitLength - 1
+	}
+
+	for input > 0 {
+		digits[i] = input % 10
+		input = input / 10
+
+		if direction == Forwards {
+			i++
+		} else {
+			i--
+		}
+	}
+
+	return digits
+}
+
+// Given a number of linked lists, this will sum them all together
+// automagically
+func SumLists(inputs ...*IntLinkedList) *IntLinkedList {
 
 	total := 0
 
@@ -67,14 +97,34 @@ func SumLists(inputs ...*IntLinkedListSupervisor) *IntLinkedListSupervisor {
 		}
 	}
 
-	digitLength := int(math.Ceil(math.Log10(float64(total + 1))))
-	digits := make([]int, digitLength)
-	i := digitLength - 1
-	for total > 0 {
-		digits[i] = total % 10
-		total = total / 10
-		i--
+	digits := intToDigitSlice(total, Backwards)
+	return NewIntLinkedList(digits...)
+}
+
+// Given a number of linked lists, this will sum them all together
+// automagically
+func SumListsOrdered(inputs ...*IntLinkedList) *IntLinkedList {
+
+	total := 0
+
+	for _, inputList := range inputs {
+
+		link := inputList.Tail
+		unit := 9 // Should be sufficiently high
+		localTotal := 0
+
+		for link != nil {
+			toAdd := link.Digit * int(math.Pow(10.0, float64(unit)))
+			localTotal += toAdd
+			unit--
+			link = link.Next
+		}
+
+		// Then divide off how far over we are
+		localTotal = localTotal / int(math.Pow(10.0, float64(unit+1)))
+		total += localTotal
 	}
 
+	digits := intToDigitSlice(total, Forwards)
 	return NewIntLinkedList(digits...)
 }

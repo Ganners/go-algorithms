@@ -7,7 +7,7 @@ import (
 
 func TestNewIntLinkedList(t *testing.T) {
 
-	fixture := &IntLinkedListSupervisor{
+	fixture := &IntLinkedList{
 		Tail: &IntLink{
 			Digit: 1,
 			Next: &IntLink{
@@ -21,8 +21,7 @@ func TestNewIntLinkedList(t *testing.T) {
 	ll := NewIntLinkedList(1, 2, 3)
 
 	if !reflect.DeepEqual(*fixture, *ll) {
-		t.Errorf(
-			"Returned linked list didn't match expected %+v", fixture)
+		t.Errorf("Returned list %s does not match expected: %s", ll, fixture)
 	}
 }
 
@@ -36,6 +35,20 @@ func TestSumLists(t *testing.T) {
 
 	result := SumLists(a, b)
 	if !reflect.DeepEqual(result, c) {
-		t.Errorf("Returned list does not match expected: %+v", c)
+		t.Errorf("Returned list %s does not match expected: %s", result, c)
+	}
+}
+
+func TestSumListsOrdered(t *testing.T) {
+
+	a := NewIntLinkedList(6, 1, 7)
+	// +
+	b := NewIntLinkedList(2, 9, 5)
+	// =
+	c := NewIntLinkedList(2, 1, 9)
+
+	result := SumListsOrdered(a, b)
+	if !reflect.DeepEqual(result, c) {
+		t.Errorf("Returned list %s does not match expected: %s", result, c)
 	}
 }
