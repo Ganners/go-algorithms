@@ -81,7 +81,7 @@ func TestPushShuffle(t *testing.T) {
 	heap.Push(1)
 
 	fixture := MinHeap{
-		data: []int{1, 1, 3, 7, 9, 5, 20, 22, 24},
+		data: []int{1, 3, 1, 7, 9, 5, 20, 22, 24},
 	}
 
 	if !reflect.DeepEqual(heap.data, fixture.data) {
