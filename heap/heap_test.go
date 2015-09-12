@@ -9,9 +9,9 @@ var heap MinHeap = MinHeap{
 	data: []int{4, 6, 7, 8, 9, 10, 11},
 }
 
-func TestNumNodes(t *testing.T) {
+func TestCount(t *testing.T) {
 
-	result := heap.NumNodes()
+	result := heap.Count()
 	if result != 7 {
 		t.Errorf("Expected to be 7, got %d", result)
 	}
@@ -35,15 +35,15 @@ func TestNumLevels(t *testing.T) {
 
 func TestMinHeapString(t *testing.T) {
 
-	// 18 x 9
 	fixture := strings.Join([]string{
-		"            04",
+		"        04",
 		"",
 		"",
-		"        06        07",
+		"    06      07",
 		"",
 		"",
-		"    08    09    10    11",
+		"  08  09  10  11",
+		"",
 		"",
 	}, "\n")
 

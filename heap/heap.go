@@ -2,7 +2,6 @@ package heap
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strings"
 )
@@ -18,9 +17,11 @@ type MinHeap struct {
 	data []int
 }
 
+// Outputs the tree so it can be visualised
+//
 // Example output:
 //
-// input: [4, 6, 7, 8, 9, 10, 11] <- 1
+// Input: [4, 6, 7, 8, 9, 10, 11] <- 1
 //         ^  ^  ^  ^  ^   ^   ^
 //         v__|__|  |  |   |   |  <- 2
 //            v__|__|__|   |   |  <- 3
@@ -40,9 +41,7 @@ func (mh MinHeap) String() string {
 	maxDigitLength := mh.maxDigitLength()
 	numLevels := mh.NumLevels()
 
-	arrayHeight := (numLevels + 1) * 2
-	arrayWidth := arrayHeight * maxDigitLength
-	log.Println(arrayWidth)
+	arrayHeight := ((numLevels) * 3)
 
 	outputStr := make([]string, arrayHeight)
 
@@ -52,16 +51,21 @@ func (mh MinHeap) String() string {
 			math.Floor(
 				math.Log2(float64(key + 1))))
 
-		numSpaces := (numLevels - insertRow) * (maxDigitLength * 2)
+		levelFromBottom := numLevels - insertRow
+		numSpacesBefore := int(math.Pow(2.0, float64(levelFromBottom)))
 
-		outputStr[insertRow*(numLevels)] += strings.Repeat(" ", numSpaces)
-		outputStr[insertRow*(numLevels)] += leftPad2Len(fmt.Sprintf("%d", val), "0", maxDigitLength)
+		if outputStr[insertRow*3] != "" {
+			numSpacesBefore = (numSpacesBefore * 2) - maxDigitLength
+		}
+
+		outputStr[insertRow*3] += strings.Repeat(" ", numSpacesBefore)
+		outputStr[insertRow*3] += leftPad2Len(fmt.Sprintf("%d", val), "0", maxDigitLength)
 	}
 
-	joined := strings.Join(outputStr, "\n")
-	return joined
+	return strings.Join(outputStr, "\n")
 }
 
+// Finds the maximum length of the digits, I.e. 1023 = 4
 func (mh MinHeap) maxDigitLength() int {
 
 	return int(
@@ -70,10 +74,12 @@ func (mh MinHeap) maxDigitLength() int {
 				float64(mh.data[len(mh.data)-1] + 1))))
 }
 
-func (mh MinHeap) NumNodes() int {
+// Returns the number of nodes that exist
+func (mh MinHeap) Count() int {
 	return len(mh.data)
 }
 
+// Returns the number of levels that exist
 func (mh MinHeap) NumLevels() int {
-	return int(math.Ceil(float64(len(mh.data) / 2)))
+	return int(math.Ceil(math.Log2(float64(len(mh.data)))))
 }
