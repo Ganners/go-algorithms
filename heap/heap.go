@@ -27,13 +27,13 @@ type MinHeap struct {
 //            v__|__|__|   |   |  <- 3
 //               v_________|___|  <- 3
 // Output:
-//         04
+//        04
 //
 //
-//    06        07
+//    06      07
 //
 //
-// 08    09   10    11
+//  08  09  10  11
 //
 func (mh MinHeap) String() string {
 
@@ -59,7 +59,7 @@ func (mh MinHeap) String() string {
 		}
 
 		outputStr[insertRow*3] += strings.Repeat(" ", numSpacesBefore)
-		outputStr[insertRow*3] += leftPad2Len(fmt.Sprintf("%d", val), "0", maxDigitLength)
+		outputStr[insertRow*3] += leftPad2Len(fmt.Sprintf("%d", val), " ", maxDigitLength)
 	}
 
 	return strings.Join(outputStr, "\n")
