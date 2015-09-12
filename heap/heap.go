@@ -6,13 +6,6 @@ import (
 	"strings"
 )
 
-func padStringLeft(s string, padStr string, overallLen int) string {
-	var padCountInt int
-	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
-	var retStr = strings.Repeat(padStr, padCountInt) + s
-	return retStr[(len(retStr) - overallLen):]
-}
-
 type MinHeap struct {
 	data []int
 }
@@ -64,8 +57,7 @@ func (mh MinHeap) String() string {
 		}
 
 		outputStr[insertIndex] += strings.Repeat(" ", numSpacesBefore)
-		outputStr[insertIndex] +=
-			fmt.Sprintf("%d", val)
+		outputStr[insertIndex] += fmt.Sprintf("%d", val)
 	}
 
 	return strings.Join(outputStr, "\n")
