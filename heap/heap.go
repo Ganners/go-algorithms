@@ -37,11 +37,14 @@ type MinHeap struct {
 //
 func (mh MinHeap) String() string {
 
+	if mh.Count() < 1 {
+		return ""
+	}
+
 	// Declare array width and height
 	maxDigitLength := mh.maxDigitLength()
 	numLevels := mh.NumLevels()
-
-	arrayHeight := ((numLevels) * 3)
+	arrayHeight := (numLevels * 3) + 1
 
 	outputStr := make([]string, arrayHeight)
 
@@ -54,12 +57,15 @@ func (mh MinHeap) String() string {
 		levelFromBottom := numLevels - insertRow
 		numSpacesBefore := int(math.Pow(2.0, float64(levelFromBottom)))
 
-		if outputStr[insertRow*3] != "" {
+		insertIndex := insertRow * 3
+
+		if outputStr[insertIndex] != "" {
 			numSpacesBefore = (numSpacesBefore * 2) - maxDigitLength
 		}
 
-		outputStr[insertRow*3] += strings.Repeat(" ", numSpacesBefore)
-		outputStr[insertRow*3] += padStringLeft(fmt.Sprintf("%d", val), " ", maxDigitLength)
+		outputStr[insertIndex] += strings.Repeat(" ", numSpacesBefore)
+		outputStr[insertIndex] +=
+			fmt.Sprintf("%d", val)
 	}
 
 	return strings.Join(outputStr, "\n")
@@ -89,7 +95,7 @@ func (mh *MinHeap) swap(index1, index2 int) {
 	mh.data[index1], mh.data[index2] = mh.data[index2], mh.data[index1]
 }
 
-func (mh *MinHeap) parent(i int) {
+func (mh *MinHeap) parent(i int) (int, int) {
 
 	index := (i - 1) / 2
 	value := mh.data[index]
@@ -104,12 +110,14 @@ func (mh *MinHeap) shuffleUp(i int) {
 
 	for {
 		// Look at the parent
-		pIndex, pVal := mh.Parent(i)
+		pIndex, pVal := mh.parent(i)
 
 		// If the parent is greater, swap
 		if pVal > val {
 			mh.swap(pIndex, i)
 			i = pIndex
+		} else {
+			break
 		}
 	}
 }
@@ -117,6 +125,6 @@ func (mh *MinHeap) shuffleUp(i int) {
 // The real algorithm stuff
 func (mh *MinHeap) Push(x int) {
 
-	mh.data = mh.data.append(x)
+	mh.data = append(mh.data, x)
 	mh.shuffleUp(mh.Count() - 1)
 }

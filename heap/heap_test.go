@@ -32,18 +32,26 @@ func TestNumLevels(t *testing.T) {
 	if result != 3 {
 		t.Errorf("Expected to be 3, got %d", result)
 	}
+
+	result = MinHeap{
+		data: []int{4, 6, 7, 8},
+	}.NumLevels()
+	if result != 2 {
+		t.Errorf("Expected to be 3, got %d", result)
+	}
 }
 
 func TestMinHeapString(t *testing.T) {
 
 	fixture := strings.Join([]string{
-		"        04",
+		"         4",
 		"",
 		"",
-		"    06      07",
+		"     6       7",
 		"",
 		"",
-		"  08  09  10  11",
+		"   8   9  10  11",
+		"",
 		"",
 		"",
 	}, "\n")
@@ -63,16 +71,22 @@ func TestPushShuffle(t *testing.T) {
 
 	heap := &MinHeap{}
 	heap.Push(5)
-	heap.Push(10)
+	heap.Push(9)
 	heap.Push(7)
+	heap.Push(1)
+	heap.Push(3)
+	heap.Push(20)
+	heap.Push(22)
+	heap.Push(24)
 	heap.Push(1)
 
 	fixture := MinHeap{
-		data: []int{1, 5, 7, 10},
+		data: []int{1, 1, 3, 7, 9, 5, 20, 22, 24},
 	}
 
-	if !reflect.DeepEqual(heap, fixture) {
+	if !reflect.DeepEqual(heap.data, fixture.data) {
 
-		t.Errorf("Expected heap to look like %s, got %s", fixture, heap)
+		t.Errorf("Expected heap to look like \n%s\n, got \n%s\n",
+			fixture.String(), heap.String())
 	}
 }
