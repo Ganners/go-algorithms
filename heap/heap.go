@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func leftPad2Len(s string, padStr string, overallLen int) string {
+func padStringLeft(s string, padStr string, overallLen int) string {
 	var padCountInt int
 	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
 	var retStr = strings.Repeat(padStr, padCountInt) + s
@@ -59,7 +59,7 @@ func (mh MinHeap) String() string {
 		}
 
 		outputStr[insertRow*3] += strings.Repeat(" ", numSpacesBefore)
-		outputStr[insertRow*3] += leftPad2Len(fmt.Sprintf("%d", val), " ", maxDigitLength)
+		outputStr[insertRow*3] += padStringLeft(fmt.Sprintf("%d", val), " ", maxDigitLength)
 	}
 
 	return strings.Join(outputStr, "\n")
