@@ -83,3 +83,40 @@ func (mh MinHeap) Count() int {
 func (mh MinHeap) NumLevels() int {
 	return int(math.Ceil(math.Log2(float64(len(mh.data)))))
 }
+
+func (mh *MinHeap) swap(index1, index2 int) {
+
+	mh.data[index1], mh.data[index2] = mh.data[index2], mh.data[index1]
+}
+
+func (mh *MinHeap) parent(i int) {
+
+	index := (i - 1) / 2
+	value := mh.data[index]
+
+	return index, value
+}
+
+// Shuffles up the integer until it's in the right place
+func (mh *MinHeap) shuffleUp(i int) {
+
+	val := mh.data[i]
+
+	for {
+		// Look at the parent
+		pIndex, pVal := mh.Parent(i)
+
+		// If the parent is greater, swap
+		if pVal > val {
+			mh.swap(pIndex, i)
+			i = pIndex
+		}
+	}
+}
+
+// The real algorithm stuff
+func (mh *MinHeap) Push(x int) {
+
+	mh.data = mh.data.append(x)
+	mh.shuffleUp(mh.Count() - 1)
+}

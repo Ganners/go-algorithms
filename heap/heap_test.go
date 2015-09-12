@@ -1,6 +1,7 @@
 package heap
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -55,5 +56,23 @@ func TestMinHeapString(t *testing.T) {
 			"Output did not match the expected.\nGot:\n\n%s\n\nExpected:\n\n%s\n",
 			heapOutput,
 			fixture)
+	}
+}
+
+func TestPushShuffle(t *testing.T) {
+
+	heap := &MinHeap{}
+	heap.Push(5)
+	heap.Push(10)
+	heap.Push(7)
+	heap.Push(1)
+
+	fixture := MinHeap{
+		data: []int{1, 5, 7, 10},
+	}
+
+	if !reflect.DeepEqual(heap, fixture) {
+
+		t.Errorf("Expected heap to look like %s, got %s", fixture, heap)
 	}
 }
