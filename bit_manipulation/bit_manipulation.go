@@ -41,6 +41,10 @@ func main() {
 	bit := ((integer >> 5) & 1) == 1
 	log.Println(true, bit)
 
+	// Another way to do it (bit mask with 5 turned on)
+	bit = (integer)&(1<<5) != 0
+	log.Println(true, bit)
+
 	// To clear a bit, &^ it :-)
 
 	// Set the 5th bit OFF (clearing it)
@@ -83,4 +87,9 @@ func insertInto(n, m, i, j int) (int, error) {
 
 	// &not the 1s to set first to 0s
 	return n&^(nMask<<uint(i)) | (m << uint(i)), nil
+}
+
+// Q. What does this function do?
+func someFunction(a, b int) interface{} {
+	return !(((a << 1) &^ (b << 1)) != 0)
 }

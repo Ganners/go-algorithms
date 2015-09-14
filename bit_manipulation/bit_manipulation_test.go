@@ -25,3 +25,17 @@ func TestInsertInto(t *testing.T) {
 		)
 	}
 }
+
+func TestSomeFunction(t *testing.T) {
+
+	c := someFunction(5, 5)
+	if c.(bool) != true {
+		t.Errorf("Expected result to be true, returned false")
+	}
+
+	c = someFunction(5, 1)
+	if c.(bool) != false {
+		t.Errorf("Expected result to be false, returned true")
+	}
+
+}
