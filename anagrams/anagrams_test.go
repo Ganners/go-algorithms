@@ -1,21 +1,22 @@
 package anagrams
 
-import "testing"
+import (
+	"log"
+	"reflect"
+	"testing"
+)
 
 func TestFindAnagrams(t *testing.T) {
 
-	haystack := "abcdogfa"
+	haystack := "abcdogodfa"
 	needle := "odg"
-	expected := "dog"
+	expected := []string{"dog", "god"}
 
-	result, err := findAnagram(haystack, needle)
+	result := findAnagram(haystack, needle)
+	log.Println(result, expected)
 
-	if err != nil {
-		t.Errorf("Did not expect an error, got %s", err)
-	}
-
-	if result != expected {
-		t.Errorf("Result incorrect, expected %s got %s", expected, result)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Result incorrect, expected %v got %v", expected, result)
 	}
 
 }

@@ -1,39 +1,59 @@
 package anagrams
 
-import "errors"
-
-func findAnagram(haystack, needle string) (string, error) {
+func findAnagram(haystack, needle string) []string {
 
 	needleLen := len(needle)
 	lettersFound := 0
 	firstIndex := -1
 	needleMap := make(map[rune]int)
+	anagrams := []string{}
 
 	// Build the needle map to reduce runtime complexity
-	for i, l := range needle {
-		needleMap[rune(l)] = i
+	for _, l := range needle {
+		needleMap[rune(l)] = 0
 	}
 
 	// Loop our haystack, look for occurances of the needle
-	for i, l := range haystack {
-		if _, found := needleMap[rune(l)]; found {
+	for i := 0; i < len(haystack); i++ {
+
+		l := rune(haystack[i])
+		val, found := needleMap[rune(l)]
+
+		switch {
+		case found && val == 0:
 
 			lettersFound++
+			needleMap[l]++
 
 			if firstIndex < 0 {
 				firstIndex = i
 			}
 
 			// Check if we have a win
-			if lettersFound >= needleLen {
-				return haystack[firstIndex : firstIndex+needleLen], nil
+			if lettersFound < needleLen {
+				continue
 			}
-		} else {
+
+			anagrams = append(anagrams, haystack[firstIndex:firstIndex+needleLen])
+
+			// Fall through to the reset stuff
+			fallthrough
+		default:
+
+			if lettersFound > 0 {
+				i = firstIndex + 1
+			}
+
 			// Reset check vars
 			lettersFound = 0
 			firstIndex = -1
+
+			// Reset the needle map
+			for l, _ := range needleMap {
+				needleMap[l] = 0
+			}
 		}
 	}
 
-	return "", errors.New("No anagram found")
+	return anagrams
 }
