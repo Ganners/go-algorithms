@@ -11,7 +11,8 @@ func LargestRectangle(histogram []int) int {
 	// Prepend and append 0 so we have a start value
 	histogram = append(append([]int{0}, histogram...), 0)
 
-	// Create a stack and start it with a 0
+	// Create a stack and start it with a 0. Note here is the stack will keep
+	// track of the histogram indexes, not the values
 	stack := list.New()
 	stack.PushBack(0)
 	max := 0
