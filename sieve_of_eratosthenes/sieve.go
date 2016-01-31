@@ -1,3 +1,6 @@
+// This is an implementation of the prime sieve, but rather than returning the
+// first N prime numbers, it will give you the prime numbers up to N. More
+// useful for my purposes
 package sieve
 
 // Aggregates and returns the sieve
