@@ -35,6 +35,11 @@ func SieveOfEratosthenes(upTo int) (chan int, chan struct{}) {
 	feed := feedNumbers(upTo)
 
 	go func() {
+
+		// Loop the primes until we get a 0 (which would be passed from the
+		// original feed). This daisy chanes the feed -> outFeed over and over
+		// until we're out of numbers. Each shake operation will act as the
+		// daisy chained filter to weed out the lowest prime in each
 		for {
 			prime := <-feed
 
@@ -48,6 +53,8 @@ func SieveOfEratosthenes(upTo int) (chan int, chan struct{}) {
 
 			// Filter and swap this feed to the out feed from this
 			outFeed := shake(feed, prime)
+
+			// Daisy chain
 			feed = outFeed
 		}
 	}()
