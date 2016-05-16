@@ -18,27 +18,26 @@ type Date struct {
 
 // OddPlus11 will give you a channel which you can pass in a date, you'll then
 // receive the day of the week for that date
-func OddPlus11() (chan<- Date, <-chan string) {
+func OddPlus11Pipelined() (chan<- Date, <-chan string) {
 
 	in := make(chan Date)
 
-	pipe := twoYearDate(in)
-	pipe = oddPlus11(pipe)
-	pipe = divide2(pipe)
-	pipe = oddPlus11(pipe)
-	pipe = modulo7(pipe)
-	pipe = subtractFrom7(pipe)
-	pipe = driftDoomsday(pipe)
-	pipe = driftClosestDay(pipe)
-	pipe = modulo7(pipe)
+	pipe := twoYearDatePipe(in)
+	pipe = oddPlus11Pipe(pipe)
+	pipe = divide2Pipe(pipe)
+	pipe = oddPlus11Pipe(pipe)
+	pipe = subtractFrom7Pipe(pipe)
+	pipe = driftDoomsdayPipe(pipe)
+	pipe = driftClosestDayPipe(pipe)
+	pipe = modulo7Pipe(pipe)
 
-	out := toString(pipe)
+	out := toStringPipe(pipe)
 
 	return in, out
 }
 
 // Grabs the tens and units from the year (last two numbers)
-func twoYearDate(in chan Date) chan Date {
+func twoYearDatePipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -52,7 +51,7 @@ func twoYearDate(in chan Date) chan Date {
 }
 
 // If the number is odd, we add 11
-func oddPlus11(in chan Date) chan Date {
+func oddPlus11Pipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -67,7 +66,7 @@ func oddPlus11(in chan Date) chan Date {
 }
 
 // Divides the number by two
-func divide2(in chan Date) chan Date {
+func divide2Pipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -80,7 +79,7 @@ func divide2(in chan Date) chan Date {
 }
 
 // Performs a mod 7 on the number, in the positive set of numbers
-func modulo7(in chan Date) chan Date {
+func modulo7Pipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -96,7 +95,7 @@ func modulo7(in chan Date) chan Date {
 }
 
 // Subtracts the number from 7
-func subtractFrom7(in chan Date) chan Date {
+func subtractFrom7Pipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -109,7 +108,7 @@ func subtractFrom7(in chan Date) chan Date {
 }
 
 // Drifts to the doomsday
-func driftDoomsday(in chan Date) chan Date {
+func driftDoomsdayPipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -133,7 +132,7 @@ func driftDoomsday(in chan Date) chan Date {
 }
 
 // Drifts to the closest day of the month
-func driftClosestDay(in chan Date) chan Date {
+func driftClosestDayPipe(in chan Date) chan Date {
 	out := make(chan Date)
 	go func() {
 		for {
@@ -184,7 +183,7 @@ func driftClosestDay(in chan Date) chan Date {
 }
 
 // Converts the dayOfWeek attached to the date and sends back a string
-func toString(in chan Date) chan string {
+func toStringPipe(in chan Date) chan string {
 	out := make(chan string)
 	go func() {
 		for {

@@ -82,18 +82,61 @@ func TestOddPlus11(t *testing.T) {
 		},
 	}
 
-	inputChan, answerChan := OddPlus11()
+	// Build the pipelined OddPlus11 outside of the loop
+	inputChan, answerChan := OddPlus11Pipelined()
 
 	for _, test := range testCases {
 
 		// Test - send something in and way for something to come out
-		inputChan <- test.in
-		answer := <-answerChan
+		{
+			inputChan <- test.in
+			answer := <-answerChan
 
-		if answer != test.out {
-			t.Errorf("[%d-%d-%d] Answer %s does not match expected %s",
-				test.in.Year, test.in.Month, test.in.Day,
-				answer, test.out)
+			if answer != test.out {
+				t.Errorf("[%d-%d-%d] Answer %s does not match expected %s",
+					test.in.Year, test.in.Month, test.in.Day,
+					answer, test.out)
+			}
 		}
+
+		// Test the procedural
+		{
+			out := OddPlus11Procedural(test.in)
+			if out != test.out {
+				t.Errorf("[%d-%d-%d] Answer %s does not match expected %s",
+					test.in.Year, test.in.Month, test.in.Day,
+					out, test.out)
+			}
+		}
+
+		// Test the functional
+		{
+			out := OddPlus11Functional(test.in)
+			if out != test.out {
+				t.Errorf("[%d-%d-%d] Answer %s does not match expected %s",
+					test.in.Year, test.in.Month, test.in.Day,
+					out, test.out)
+			}
+		}
+	}
+}
+
+func BenchmarkOddPlus1Pipelined(b *testing.B) {
+	inputChan, answerChan := OddPlus11Pipelined()
+	for i := 0; i < b.N; i++ {
+		inputChan <- Date{2016, 3, 16, 0}
+		<-answerChan
+	}
+}
+
+func BenchmarkOddPlus1Procedural(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		OddPlus11Procedural(Date{2016, 3, 16, 0})
+	}
+}
+
+func BenchmarkOddPlus1Functional(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		OddPlus11Functional(Date{2016, 3, 16, 0})
 	}
 }
