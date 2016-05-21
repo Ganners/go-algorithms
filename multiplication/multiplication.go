@@ -1,45 +1,74 @@
-package main
+package multiplication
 
-import "log"
+// Iterative method where we grab the log of the smallest value
+func Multiply2(a, b int) int {
 
-func main() {
-	c := multiply(15, 30)
-	log.Println(c)
+	// Our short circuits, also make sure a is smallest
+	if a == 0 || b == 0 {
+		return 0
+	}
+
+	if a > b {
+		b, a = a, b
+	}
+
+	if a == 1 {
+		return b
+	}
+
+	// Start calculating c, build an adequately large stack
+	//
+	// We need to bring this into a stack as we have to work backwards
+	// through it, essentially because we need to look at if it's odd
+	// and apply the addition in reverse
+	c := b
+	stack := make([]int, 0, 8)
+
+	for ; a > 1; a >>= 1 {
+		stack = append(stack, a)
+	}
+
+	for i := len(stack) - 1; i >= 0; i-- {
+		c <<= 1
+		if (stack[i] & 1) == 1 {
+			c += b
+		}
+	}
+
+	return c
 }
 
-func multiply(a, b int) int {
+// Recursive method
+func Multiply1(a, b int) int {
 
-	// Defaults to a smaller than b
-	smallest := a
-	largest := b
+	// Answer if 0 if any inputs are 0
+	if a == 0 || b == 0 {
+		return 0
+	}
 
 	// If wrong, flip them
 	if a > b {
-		smallest, largest = largest, smallest
+		b, a = a, b
 	}
 
-	if smallest == 0 {
-		return 0
-	}
-
-	return multiplyRecursive(smallest, largest)
+	return multiplyRecursive(a, b)
 }
 
-func multiplyRecursive(smallest, largest int) int {
+func multiplyRecursive(a, b int) int {
 
-	if smallest == 0 {
+	if a == 0 {
 		return 0
 	}
 
-	if smallest == 1 {
-		return largest
+	if a == 1 {
+		return b
 	}
 
-	halfProduct := multiplyRecursive(smallest>>1, largest)
+	c := multiplyRecursive(a>>1, b) << 1
 
-	if (smallest & 1) == 1 {
-		return (halfProduct << 1) + largest
-	} else {
-		return (halfProduct << 1)
+	if (a & 1) == 1 {
+		c += b
 	}
+
+	return c
 }
