@@ -14,3 +14,19 @@ func SumSquaresBrute(n int) int {
 	}
 	return sum
 }
+
+// Efficient
+func SumCubes(n int) int {
+	s := (n * (n + 1) / 2)
+	return s * s
+}
+
+// Brute force, used for comparative testing
+func SumCubesBrute(n int) int {
+	sum := 0
+	for i := 0; i <= n; i++ {
+		sq := i * i * i
+		sum += sq
+	}
+	return sum
+}
