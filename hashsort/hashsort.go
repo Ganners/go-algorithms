@@ -2,6 +2,8 @@ package hashsort
 
 import "math"
 
+// SuperHash just works out a column and row, this functionality is
+// inlined in the HashSort function
 func SuperHash(key, n int) (int, int) {
 	square := int(math.Ceil(math.Sqrt(float64(n))))
 	col := key % square
@@ -9,6 +11,8 @@ func SuperHash(key, n int) (int, int) {
 	return row, col
 }
 
+// HashSort operates theoretically in N time and 2 space, it doesn't
+// replace but generates a new array (2D to deal with duplicates).
 func HashSort(in []int) []int {
 	size := len(in)
 	width := int(math.Ceil(math.Sqrt(float64(size))))
