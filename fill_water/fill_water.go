@@ -1,44 +1,37 @@
 package fill_water
 
-import "container/list"
-
+// This version of the function operates in about O(2N)
 func FillWaterCount(env []int) int {
 
 	if len(env) <= 2 {
 		return 0
 	}
 
+	env = append([]int{0}, env...)
 	total := 0
-	stack := list.New()
-	start := 0
-	largest := 0
+	fromLargest := 1
+	toLargest := 0
 
-	for i := 1; i < len(env); i++ {
-
-		if env[i] < env[start] {
-			stack.PushBack(i)
+	for fromLargest != len(env)-1 {
+		for i := fromLargest + 1; i < len(env); i++ {
+			if env[i] > env[toLargest] {
+				toLargest = i
+			}
+			if env[toLargest] > env[fromLargest] {
+				break
+			}
 		}
 
-		if env[i] > env[start] {
+		min := env[toLargest]
+		if env[fromLargest] < env[toLargest] {
+			min = env[fromLargest]
 		}
 
-		// if env[i] > env[largest] {
-		// 	largest = i
-		// } else {
-		// 	stack.PushBack(i)
-		// }
+		for i := fromLargest + 1; i < toLargest; i++ {
+			total += min - env[i]
+		}
 
-		// // ignore := i - largest
-		// // ignored := 0
-		// for stack.Len() > 0 {
-		// 	key := stack.Remove(stack.Back()).(int)
-		// 	size := env[size]
-		// 	// if ignored < ignore {
-		// 	// 	continue
-		// 	// }
-		// 	log.Printf("Adding %d", env[largest]-size)
-		// 	total += env[largest] - size
-		// }
+		fromLargest, toLargest = toLargest, 0
 	}
 
 	return total
