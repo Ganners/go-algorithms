@@ -2,6 +2,15 @@ package fill_water
 
 import "testing"
 
+func BenchmarkFillWaterCount(b *testing.B) {
+	environment := []int{
+		4, 1, 3, 9, 0, 3, 1, 4, 9, 1, 1, 3, 2,
+	}
+	for i := 0; i < b.N; i++ {
+		FillWaterCount(environment)
+	}
+}
+
 func TestFillWaterCount(t *testing.T) {
 
 	testCases := []struct {
