@@ -12,7 +12,10 @@ func FillWaterCount(env []int) int {
 	fromLargest := 1
 	toLargest := 0
 
+	// While we haven't looked at every row
 	for fromLargest != len(env)-1 {
+
+		// Forward lookup
 		for i := fromLargest + 1; i < len(env); i++ {
 			if env[i] > env[toLargest] {
 				toLargest = i
@@ -22,11 +25,13 @@ func FillWaterCount(env []int) int {
 			}
 		}
 
+		// Calculate the minimum
 		min := env[toLargest]
 		if env[fromLargest] < env[toLargest] {
 			min = env[fromLargest]
 		}
 
+		// Loop back and add to total
 		for i := fromLargest + 1; i < toLargest; i++ {
 			total += min - env[i]
 		}
