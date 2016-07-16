@@ -85,7 +85,7 @@ func TestHashSort(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		if out := HashSort(test.In); !reflect.DeepEqual(out, test.Out) {
+		if out := HashSort(test.In, test.In[0]); !reflect.DeepEqual(out, test.Out) {
 			t.Error("Expected %v got %v", test.Out, out)
 		}
 	}
@@ -135,7 +135,7 @@ func BenchmarkBuiltinSort1000000(b *testing.B) {
 func fill(to int) []int {
 	out := make([]int, 0, to)
 	for i := 1; i <= to; i++ {
-		out = append(out, i)
+		out = append(out, i*2)
 	}
 	return out
 }
@@ -144,7 +144,7 @@ func fill(to int) []int {
 func fillReverse(to int) []int {
 	out := make([]int, 0, to)
 	for i := to; i > 0; i-- {
-		out = append(out, i)
+		out = append(out, i*2)
 	}
 	return out
 }
@@ -152,7 +152,7 @@ func fillReverse(to int) []int {
 func benchSortHelper(b *testing.B, N int) {
 	input := fillReverse(N)
 	for i := 0; i < b.N; i++ {
-		HashSort(input)
+		HashSort(input, N*2)
 	}
 }
 

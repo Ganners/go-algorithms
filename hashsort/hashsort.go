@@ -13,9 +13,8 @@ func SuperHash(key, n int) (int, int) {
 
 // HashSort operates theoretically in N time and 2 space, it doesn't
 // replace but generates a new array (2D to deal with duplicates).
-func HashSort(in []int) []int {
-	size := len(in)
-	width := int(math.Ceil(math.Sqrt(float64(size))))
+func HashSort(in []int, max int) []int {
+	width := int(math.Ceil(math.Sqrt(float64(max))))
 	hashArray := make([][]int, width*width+width)
 	flatHashArray := make([]int, 0, len(hashArray))
 
