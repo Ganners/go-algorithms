@@ -8,27 +8,28 @@ import (
 func montyHall(iterations int, doSwitch bool) (numCorrect, numIncorrect int) {
 	for i := 0; i < iterations; i++ {
 		// Start with 3 rooms
-		rooms := []int{1, 2, 3}
-		winnerI := rand.Intn(len(rooms))
-		winner := rooms[winnerI]
+		rooms := []int{0, 1, 2}
+		winner := rand.Intn(len(rooms))
 
 		// Pick a room
-		chooseI := rand.Intn(len(rooms) - 1)
-		choose := rooms[chooseI]
-		remaining := append(rooms[:chooseI], rooms[chooseI+1:]...)
+		choose := rand.Intn(len(rooms) - 1)
+		remaining := append(rooms[:choose], rooms[choose+1:]...)
 
-		// Host opens a door
-		hostDoorI := 0
-		if remaining[0] == winner {
-			hostDoorI = 1
+		// Host opens a door, pick the first available
+		hostDoor := 0
+		for j := 0; j < len(remaining); j++ {
+			if remaining[j] != winner {
+				hostDoor = j
+			}
 		}
 
 		// Stay or switch?
 		if doSwitch {
-			remaining = append(rooms[:hostDoorI], rooms[hostDoorI+1:]...)
+			remaining = append(rooms[:hostDoor], rooms[hostDoor+1:]...)
 			choose = remaining[0]
 		}
 
+		// Track
 		if choose == winner {
 			numCorrect++
 		} else {
