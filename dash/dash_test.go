@@ -2,8 +2,9 @@ package dash
 
 import "testing"
 
+// Effectively tests the Dijkstra search, but with the validation
+// wrapper of the Dash function
 func TestDictionaryDash(t *testing.T) {
-
 	for _, test := range []struct {
 		start           string
 		end             string
@@ -75,12 +76,27 @@ func TestDictionaryDash(t *testing.T) {
 			},
 			transformations: 0,
 		},
+		{
+			start: "hit",
+			end:   "bag",
+			dictionary: []string{
+				"hit",
+				"hut",
+				"hot",
+				"dot",
+				"dog",
+				"cog",
+				"cag",
+				"bog",
+				"bag",
+			},
+			transformations: 5,
+		},
 	} {
 
-		transformations, err := DictionaryDash(
-			test.start,
-			test.end,
-			test.dictionary)
+		// Construct the graph and execute a single dash on it
+		dd := NewDictionaryDash(test.dictionary)
+		transformations, err := dd.Dash(test.start, test.end)
 
 		if err != nil {
 			t.Errorf("Did not expect error, got %s", err)

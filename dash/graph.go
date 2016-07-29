@@ -5,13 +5,16 @@ import (
 	"strings"
 )
 
-// Constructs a node
+const (
+	// Taken from math.Inf(+1), means I don't need to convert from
+	// float64... :)
+	inf = 0x7FF0000000000000
+)
+
+// A node in the graph
 type node struct {
 	word       string
 	neighbours []*node
-
-	// Used during search
-	parent *node
 }
 
 // Adds a neighbour to the list of neighbour edges
@@ -52,7 +55,7 @@ func toString(n *node, seen map[string]struct{}) string {
 // We also return a map to the nodes, so we can look up the start and end
 //
 // Where M is length of word, N is cardinality of dictionary
-// The time complexity is O(M *N * N/2), space is O(N)
+// The time complexity is O(M * 2N), space is O(N)
 func constructGraph(dictionary []string) (*node, map[string]*node) {
 
 	nodeMap := make(map[string]*node)
@@ -103,4 +106,55 @@ func distance(str1, str2 string) int {
 		}
 	}
 	return differences
+}
+
+// Performs dijkstra search to find the shortest path between the start
+// and end node
+//
+// The space complexity is O(2N) where N is the number of dictionary
+// words The time compexity is O(N^2)
+func dijkstra(graph map[string]*node, start, end *node) int {
+
+	q := make(map[*node]int, len(graph))
+	visited := make(map[*node]int, len(graph))
+
+	// Set the start node to visited with weight 0
+	visited[start] = 0
+	current := start
+
+	for {
+		for _, neighbour := range current.neighbours {
+			if _, found := visited[neighbour]; found {
+				continue
+			}
+			if weight, found := q[neighbour]; found && weight < visited[current]+1 {
+				continue
+			}
+			q[neighbour] = visited[current] + 1
+		}
+
+		// Break out when we've used up the q
+		if len(q) == 0 || visited[end] != 0 {
+			break
+		}
+		min := inf
+		for node, weight := range q {
+			if weight <= min {
+				current = node
+				min = weight
+			}
+		}
+
+		// Remove current from the queue
+		delete(q, current)
+
+		// Set the visited to the min
+		visited[current] = min
+	}
+
+	// If we managed to found the end node then we can return the path and weight
+	if weight, found := visited[end]; found {
+		return weight
+	}
+	return inf
 }
