@@ -39,6 +39,9 @@ func TestReverseBits(t *testing.T) {
 		if out := ReverseBits(test.input); out != test.output {
 			t.Errorf("Output %b does not match expected %b", out, test.output)
 		}
+		if out := ReverseBitsBitwise(test.input); out != test.output {
+			t.Errorf("Output %b does not match expected %b", out, test.output)
+		}
 	}
 }
 
