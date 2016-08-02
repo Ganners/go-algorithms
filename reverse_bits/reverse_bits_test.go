@@ -42,6 +42,9 @@ func TestReverseBits(t *testing.T) {
 		if out := ReverseBitsBitwise(test.input); out != test.output {
 			t.Errorf("Output %b does not match expected %b", out, test.output)
 		}
+		if out := ReverseBitsMagic(test.input); out != test.output {
+			t.Errorf("Output %b does not match expected %b", out, test.output)
+		}
 	}
 }
 
@@ -51,4 +54,25 @@ func parseBinary(binary string) uint8 {
 		return 0
 	}
 	return uint8(i)
+}
+
+func BenchmarkReverseBits(b *testing.B) {
+	input := parseBinary("00110001")
+	for i := 0; i < b.N; i++ {
+		ReverseBitsMagic(input)
+	}
+}
+
+func BenchmarkReverseBitsBitwise(b *testing.B) {
+	input := parseBinary("00110001")
+	for i := 0; i < b.N; i++ {
+		ReverseBitsMagic(input)
+	}
+}
+
+func BenchmarkReverseBitsBitwiseMagic(b *testing.B) {
+	input := parseBinary("00110001")
+	for i := 0; i < b.N; i++ {
+		ReverseBitsMagic(input)
+	}
 }

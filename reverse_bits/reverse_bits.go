@@ -2,6 +2,20 @@ package reverse_bits
 
 import "math"
 
+func ReverseBitsBitwise(bits uint8) uint8 {
+	output := uint8(0)
+	for i := 7; i >= 0; i-- {
+		if bits == 0 {
+			break
+		}
+		if (bits & 1) == 1 {
+			output |= 1 << uint(i)
+		}
+		bits >>= 1
+	}
+	return output
+}
+
 // Reverses the bits on an int64
 // Operates in O(N) time and O(1) space
 func ReverseBits(bits uint8) uint8 {
@@ -35,7 +49,7 @@ func ReverseBits(bits uint8) uint8 {
 // This method was attributed to Rich Schroeppel in the Programming Hacks
 // section of Beeler, M., Gosper, R. W., and Schroeppel, R. HAKMEM. MIT AI Memo
 // 239, Feb. 29, 1972.
-func ReverseBitsBitwise(bits uint8) uint8 {
+func ReverseBitsMagic(bits uint8) uint8 {
 	//    02 02 02 02 02
 	// 01 08 84 42 20 10
 	b := (int64(bits) * 0x0202020202 & 0x010884422010) % 1023
