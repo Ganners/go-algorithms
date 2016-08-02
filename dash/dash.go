@@ -8,6 +8,7 @@ var (
 	ErrLengthsDoNotMatch  = errors.New("Lengths do not match")
 	ErrStartWordNotFound  = errors.New("Start word could not be found in dictionary")
 	ErrEndWordNotFound    = errors.New("End word could not be found in dictionary")
+	ErrGoalUnreachable    = errors.New("Could not reach the end goal")
 )
 
 // DictionaryDash will contain a dictionary (stored as a graph) and
@@ -59,6 +60,11 @@ func (dd *DictionaryDash) Dash(start, end string) (int, error) {
 	// between the nodes. If we want to see an output of the path that was
 	// taken then we can return the first component
 	transformations := dijkstra(dd.graph, dd.graph[start], dd.graph[end])
+
+	// If the transformations is infinite, the goal isn't reachable
+	if transformations == inf {
+		return 0, ErrGoalUnreachable
+	}
 
 	return transformations, nil
 }
