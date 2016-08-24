@@ -14,5 +14,6 @@ func RandomDistribution(constant, variable string) float64 {
 	fnvHash := fnv.New64a()
 	fnvHash.Write([]byte(constant + variable))
 	littleEndian := binary.LittleEndian.Uint64(fnvHash.Sum(nil))
+
 	return float64(littleEndian) / float64(1<<64-1)
 }
