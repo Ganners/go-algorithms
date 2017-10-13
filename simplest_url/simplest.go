@@ -1,4 +1,4 @@
-package simplest
+package simplest_url
 
 import (
 	"net/url"
@@ -6,13 +6,13 @@ import (
 
 type Response struct {
 	URL      string
-	Checksum uint64
+	Checksum string
 }
 
 // The goal is to find the set of query params that actually make the
 // difference in the outcome of the Response
 func FindWhitelistQueryParams(urls []Response) []string {
-	checksumInverse := make(map[uint64][]url.Values)
+	checksumInverse := make(map[string][]url.Values)
 	// fill the inverse with query values
 	for _, response := range urls {
 		parsed, err := url.Parse(response.URL)
