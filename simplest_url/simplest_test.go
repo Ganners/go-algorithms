@@ -24,7 +24,7 @@ func TestFindWhitelistQueryParams(t *testing.T) {
 			},
 		},
 	} {
-		result := FindWhitelistQueryParams(test.URLs)
+		result, _ := FindWhitelistQueryParams(test.URLs)
 		if !reflect.DeepEqual(result, test.WhitelistQueryParams) {
 			t.Errorf("result %v does not match expected %v", result, test.WhitelistQueryParams)
 		}
