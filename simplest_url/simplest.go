@@ -11,13 +11,13 @@ type Response struct {
 
 // The goal is to find the set of query params that actually make the
 // difference in the outcome of the Response
-func FindWhitelistQueryParams(urls []Response) ([]string, map[string]int) {
+func FindWhitelistQueryParams(urls []Response) ([]string, map[string]int, map[string]struct{}) {
 	checksumInverse := make(map[string][]url.Values)
 	// fill the inverse with query values
 	for _, response := range urls {
 		parsed, err := url.Parse(response.URL)
 		if err != nil {
-			return nil, nil
+			return nil, nil, nil
 		}
 		checksumInverse[response.Checksum] = append(checksumInverse[response.Checksum], parsed.Query())
 	}
@@ -65,5 +65,5 @@ func FindWhitelistQueryParams(urls []Response) ([]string, map[string]int) {
 	for key := range globalWhitelist {
 		whitelist = append(whitelist, key)
 	}
-	return whitelist, globalWhitelist
+	return whitelist, globalWhitelist, blacklist
 }
