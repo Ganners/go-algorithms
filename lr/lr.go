@@ -166,7 +166,7 @@ func evaluate(X [][]float64, y []float64, coef []float64) float64 {
 	return math.Sqrt(sumErr / float64(len(X)))
 }
 
-func main() {
+func wine() {
 	X, y, err := loadData()
 	if err != nil {
 		log.Fatal(err)
@@ -184,7 +184,7 @@ func main() {
 	best := math.Inf(1)
 	bestCoefs := []float64{}
 	for _, a := range []float64{0.1, 0.01, 0.001, 0.0001, 0.0005, 0.00001} {
-		for _, b := range []int{10, 20, 50, 100, 200, 500, 1000, 10000} {
+		for _, b := range []int{10, 20, 50, 100, 200, 500, 1000} {
 			coef := linearRegressionSGD(Xtrain, ytrain, a, b)
 			rmse := evaluate(Xtest, ytest, coef)
 			if rmse < best {
@@ -194,4 +194,87 @@ func main() {
 		}
 	}
 	log.Println("best rmse", best, bestCoefs)
+}
+
+func ctof() {
+	X := [][]float64{
+		{0},
+		{1},
+		{2},
+		{3},
+		{4},
+		{5},
+		{6},
+		{7},
+		{8},
+		{9},
+		{10},
+		{20},
+		{30},
+		{40},
+		{50},
+		{60},
+		{70},
+		{80},
+		{90},
+		{100},
+		{200},
+		{300},
+		{400},
+		{500},
+		{600},
+		{700},
+		{800},
+		{900},
+		{1000},
+	}
+	y := []float64{
+		32.0,
+		33.8,
+		35.6,
+		37.4,
+		39.2,
+		41.0,
+		42.8,
+		44.6,
+		46.4,
+		48.2,
+		50.0,
+		68.0,
+		86.0,
+		104.0,
+		122.0,
+		140.0,
+		158.0,
+		176.0,
+		194.0,
+		212.0,
+		392.0,
+		572.0,
+		752.0,
+		932.0,
+		1112.0,
+		1292.0,
+		1472.0,
+		1652.0,
+		1832.0,
+	}
+
+	// normalize X and y
+	X = normalize(X)
+	// y = transpose(normalize(transpose([][]float64{y})))[0]
+
+	// split test/train
+	split := int(float64(len(X)) * 0.9)
+	Xtrain, Xtest, ytrain, ytest := X[:split], X[split+1:], y[:split], y[split+1:]
+
+	// compute coefficients from SGD
+	coef := linearRegressionSGD(Xtrain, ytrain, 0.1, 100)
+	rmse := evaluate(Xtest, ytest, coef)
+	log.Println("rmse", coef, rmse, predict([]float64{20 / 1000}, coef))
+}
+
+func main() {
+	wine()
+	ctof()
 }
