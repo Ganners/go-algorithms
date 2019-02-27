@@ -1,58 +1,24 @@
-#include "go_asm.h"
-#include "funcdata.h"
 #include "textflag.h"
 
-// Sum(f []int) int
-TEXT ·Sum(SB),NOSPLIT,$0
+// sumFloatAVX(f []float64) float64
+TEXT ·sumFloatAVX(SB),NOSPLIT,$0-32
 	MOVQ f+0(FP), AX
-	MOVL len+8(FP), DX
-	XORQ BX, BX
-	XORQ CX, CX
-
-ADD_PREV:
-	DECQ DX
-
-	MOVQ (AX)(DX * 8), CX
-	ADDQ CX, BX
-
-	CMPQ DX, $0
-	JNE ADD_PREV
-
-RETURN:
-	MOVQ BX, ret+24(FP)
-	RET
+	MOVQ len+8(FP), BX
 
 
-// SumFloat(f []float64) float64
-TEXT ·SumFloat(SB),NOSPLIT,$0
-	MOVQ f+0(FP), AX
-	MOVL len+8(FP), DX
-	XORPS X0, X0
-	XORL CX, CX
+	// clear 256 bit registers that we'll be using
+	VPXOR Y0, Y0, Y0
+	VPXOR Y1, Y1, Y1
+	VPXOR Y2, Y2, Y2
 
-ADD_PREV:
-	DECL DX
+	VMOVUPD (AX), Y0
+	VMOVUPD (32)(AX), Y1
 
-	MOVSD (AX)(DX * 8), X1
-	ADDSD X1, X0
+	VADDPD Y0, Y1, Y1
+	VPERM2F128 $1, Y1, Y1, Y2
+	VADDPD Y1, Y2, Y2
+	VHADDPD Y2, Y2, Y2
 
-	CMPL DX, $0
-	JNE ADD_PREV
-
-RETURN:
-	MOVSD X0, ret+24(FP)
-	RET
-
-
-// SumFloatAVX(f []float64) float64
-TEXT ·SumFloatAVX(SB),NOSPLIT,$0
-	MOVQ f+0(FP), AX
-	MOVL len+8(FP), DX
-
-	VMOVUPD 0(AX), Y0
-	VMOVUPD 16(AX), Y1
-
-	VHADDPD Y0, Y1, Y1
-	VMOVUPD Y1, ret+24(FP)
+	MOVQ X2, ret+24(FP)
 
 	RET
