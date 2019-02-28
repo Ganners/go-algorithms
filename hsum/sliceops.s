@@ -98,17 +98,22 @@ sumNext:
 	MOVQ X2, ret+24(FP)
 	RET
 
-// IDK(f []float64) []float64
+// IDK(a, b []float64) []float64
 TEXT ·IDK(SB),NOSPLIT,$0-64
-	MOVQ f+0(FP), AX
-	MOVQ len+8(FP), BX
-	MOVQ cap+16(FP), CX
+	// slice A
+	MOVQ a+0(FP), AX
 
-	// this extends into some other memory which is kewl
-	ADDQ $5, BX
-	ADDQ $5, CX
+	// slice B
+	MOVQ a+24(FP), BX
 
-	MOVQ AX, ret+24(FP)
-	MOVQ BX, ret+32(FP)
-	MOVQ CX, ret+40(FP)
+	VMOVUPD (AX), Y0
+	VMOVUPD (BX), Y1
+
+	VADDPD Y0, Y1, Y1
+
+	VMOVUPD Y1, (AX)
+
+	MOVQ AX, ret+48(FP)
+	MOVQ $4, ret+56(FP)
+	MOVQ $4, ret+64(FP)
 	RET

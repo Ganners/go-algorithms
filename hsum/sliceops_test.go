@@ -21,10 +21,10 @@ func generateSeries32(l int) []float32 {
 }
 
 func TestIDK(t *testing.T) {
-	s := generateSeries(8)
-	r := IDK(s)
+	a := generateSeries(4)
+	b := generateSeries(8)[4:]
+	r := IDK(a, b)
 
-	t.Errorf("%v", s)
 	t.Errorf("%v", r)
 }
 
