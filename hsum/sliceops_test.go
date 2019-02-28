@@ -20,6 +20,14 @@ func generateSeries32(l int) []float32 {
 	return input
 }
 
+func TestIDK(t *testing.T) {
+	s := generateSeries(8)
+	r := IDK(s)
+
+	t.Errorf("%v", s)
+	t.Errorf("%v", r)
+}
+
 func TestSumFloat32AVX(t *testing.T) {
 	{
 		f := generateSeries32(32)

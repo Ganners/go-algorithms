@@ -11,3 +11,5 @@ func SumFloat(f []float64) float64 {
 func SumFloatAVX(f []float64) float64
 
 func SumFloat32AVX(f []float32) float32
+
+func IDK(f []float64) []float64
