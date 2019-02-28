@@ -112,7 +112,48 @@ TEXT ·IDK(SB),NOSPLIT,$0-64
 	// To sum them
 	// VADDPD Y0, Y1, Y1
 
-	VRSQRT28PD Y0, Y0
+	// To divide them
+	// VDIVPD Y1, Y0, Y1
+
+	// To multiply them
+	// VMULPD Y0, Y1, Y1
+
+	// To compute the max
+	// VMAXPD Y0, Y1, Y1
+
+	// To compute the min
+	// VMINPD Y0, Y1, Y1
+
+	// To round (.5 is ceil)
+	// VDIVPD Y1, Y0, Y1
+	// VADDPD Y1, Y1, Y1
+	// VADDPD Y1, Y1, Y1
+	// VROUNDPD $0, Y1, Y1
+
+	// floor
+	// VDIVPD Y1, Y0, Y1
+	// VADDPD Y1, Y1, Y1
+	// VADDPD Y1, Y1, Y1
+	// VROUNDPD $1, Y1, Y1
+
+	// ceil
+	// VDIVPD Y1, Y0, Y1
+	// VADDPD Y1, Y1, Y1
+	// VADDPD Y1, Y1, Y1
+	// VROUNDPD $2, Y1, Y1
+
+	// sqrt
+	// VSQRTPD Y1, Y1
+
+	// make some integers n convert to floats
+	// MOVQ $10, 0(CX)
+	// MOVQ $20, 4(CX)
+	// MOVQ $30, 8(CX)
+	// MOVQ $40, 12(CX)
+	// VCVTDQ2PD (CX), Y1
+
+	// how do we do this :thinking:
+	// RDRAND (AX)
 
 	VMOVUPD Y1, (AX)
 
