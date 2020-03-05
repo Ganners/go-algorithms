@@ -12,7 +12,6 @@ func main() {
 	cr := 0.5
 
 	inside := 0
-	outside := 0
 	numSamples := 1000000
 
 	for i := 0; i < numSamples; i++ {
@@ -28,5 +27,5 @@ func main() {
 
 	area := float64(inside) / float64(numSamples) // this is pi * r ^ 2
 	pi := area / (cr * cr)                        // pi is area / r ^ 2
-	fmt.Println(inside, outside, pi)
+	fmt.Println(inside, pi)
 }
