@@ -1,16 +1,21 @@
 package cosdist
 
-import "sort"
+import (
+	"math"
+	"sort"
+)
 
 type Index struct {
-	EntryIDs     []string
-	EntryVectors [][]float32
+	entryIDs     []string
+	entryVectors [][]float32
+	knnBatchSize int
 }
 
 func NewIndex(entryIDs []string, entryVectors [][]float32) *Index {
 	return &Index{
-		EntryIDs:     entryIDs,
-		EntryVectors: entryVectors,
+		entryIDs:     entryIDs,
+		entryVectors: entryVectors,
+		knnBatchSize: 1024,
 	}
 }
 
@@ -30,15 +35,39 @@ func (d ByDistance) Less(i, j int) bool {
 	return d.Distances[i].distance < d.Distances[j].distance
 }
 
-func (idx *Index) computeDistances(centroid []float32) Distances {
-	distances := make([]distanceTuple, len(idx.EntryIDs))
-	for i := range idx.EntryIDs {
-		distances[i] = distanceTuple{
-			id:       idx.EntryIDs[i],
-			distance: CosineDistanceAVX(centroid, idx.EntryVectors[i]),
+func (idx *Index) computeDistancesBatch(centroid []float32, start, end int) Distances {
+	distances := make([]distanceTuple, end-start)
+	for i := start; i < end; i++ {
+		distances[i-start] = distanceTuple{
+			id:       idx.entryIDs[i],
+			distance: CosineDistanceAVX(centroid, idx.entryVectors[i]),
 		}
 	}
 	return distances
+}
+
+func (idx *Index) computeDistancesConcurrent(centroid []float32, batchSize int) Distances {
+	distances := Distances{}
+	distancesCh := make(chan Distances)
+	n := len(idx.entryVectors)
+	nBatches := int(math.Ceil(float64(n) / float64(batchSize)))
+
+	for start := 0; start < n; start += batchSize {
+		end := min(start+batchSize, n)
+		go func(centroid []float32, start, end int) {
+			distancesCh <- idx.computeDistancesBatch(centroid, start, end)
+		}(centroid, start, end)
+	}
+
+	for i := 0; i < nBatches; i++ {
+		distances = append(distances, []distanceTuple(<-distancesCh)...)
+	}
+
+	return distances
+}
+
+func (idx *Index) computeDistances(centroid []float32) Distances {
+	return idx.computeDistancesConcurrent(centroid, idx.knnBatchSize)
 }
 
 func (idx *Index) KNN(centroid []float32, k int) Distances {
