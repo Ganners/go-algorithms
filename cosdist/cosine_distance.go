@@ -24,3 +24,21 @@ func CosineDistance(a, b []float32) float32 {
 }
 
 func CosineDistanceAVX(a, b []float32) float32
+
+// Dot computes what it says on the tin, but all in 32 bits
+func Dot(a, b []float32) float32 {
+	// if the vector lengths don't line up then return a negative score
+	if len(a) != len(b) {
+		return -1
+	}
+
+	// Compute all dot products
+	var ab float32
+	for i := range a {
+		ab += a[i] * b[i]
+	}
+
+	return ab
+}
+
+func DotAVX(a, b []float32) float32

@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"sort"
-i)
+)
 
 type Vector []float32
 

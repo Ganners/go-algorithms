@@ -15,7 +15,7 @@ func NewIndex(entryIDs []string, entryVectors [][]float32) *Index {
 	return &Index{
 		entryIDs:     entryIDs,
 		entryVectors: entryVectors,
-		knnBatchSize: 1024,
+		knnBatchSize: 512,
 	}
 }
 
@@ -40,7 +40,7 @@ func (idx *Index) computeDistancesBatch(centroid []float32, start, end int) Dist
 	for i := start; i < end; i++ {
 		distances[i-start] = distanceTuple{
 			id:       idx.entryIDs[i],
-			distance: CosineDistanceAVX(centroid, idx.entryVectors[i]),
+			distance: DotAVX(centroid, idx.entryVectors[i]),
 		}
 	}
 	return distances

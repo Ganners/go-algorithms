@@ -18,7 +18,7 @@ var (
 	}
 )
 
-func TestComputeDistances(t *testing.T) {
+func testComputeDistances(t *testing.T) {
 	idx := NewIndex(testIDs, testEmbeddings)
 	distances := idx.computeDistances(testEmbeddings[0])
 
@@ -35,7 +35,7 @@ func TestComputeDistances(t *testing.T) {
 	}
 }
 
-func TestKNN(t *testing.T) {
+func testKNN(t *testing.T) {
 	idx := NewIndex(testIDs, testEmbeddings)
 	{
 		// Select kNN over the first embedding, we should retrieve a score of 1
@@ -85,56 +85,6 @@ func generateIndex(n, d int) *Index {
 		ids[i] = strconv.Itoa(i + 1)
 	}
 	return NewIndex(ids, vectors)
-}
-
-func BenchmarkKNN_100_512_50(b *testing.B) {
-	n, d, k := 100, 512, 50
-	idx := generateIndex(n, d)
-	centroid := generateEmbedding(d)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		idx.KNN(centroid, k)
-	}
-}
-
-func BenchmarkKNN_1000_512_50(b *testing.B) {
-	n, d, k := 1000, 512, 50
-	idx := generateIndex(n, d)
-	centroid := generateEmbedding(d)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		idx.KNN(centroid, k)
-	}
-}
-
-func BenchmarkKNN_10000_512_50(b *testing.B) {
-	n, d, k := 10000, 512, 50
-	idx := generateIndex(n, d)
-	centroid := generateEmbedding(d)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		idx.KNN(centroid, k)
-	}
-}
-
-func BenchmarkKNN_100000_512_50(b *testing.B) {
-	n, d, k := 100000, 512, 50
-	idx := generateIndex(n, d)
-	centroid := generateEmbedding(d)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		idx.KNN(centroid, k)
-	}
-}
-
-func BenchmarkKNN_1000000_512_50(b *testing.B) {
-	n, d, k := 1000000, 512, 50
-	idx := generateIndex(n, d)
-	centroid := generateEmbedding(d)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		idx.KNN(centroid, k)
-	}
 }
 
 func BenchmarkKNN_100_768_50(b *testing.B) {

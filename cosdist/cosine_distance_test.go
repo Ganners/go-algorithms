@@ -107,6 +107,89 @@ func TestCosineDistance(t *testing.T) {
 	}
 }
 
+func TestDot(t *testing.T) {
+	testCases := []struct {
+		a, b    []float32
+		product float32
+	}{
+		{
+			a:       []float32{1, 2, 3},
+			b:       []float32{1, 2, 3, 4},
+			product: -1,
+		},
+		{
+			a:       []float32{1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.0},
+			b:       []float32{1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.0, 2.1},
+			product: 69.12,
+		},
+		{
+			a:       []float32{1.1, 2.2, 3.3, 0.0, 0.0, 0.0, 0.0, 0.0},
+			b:       []float32{1.2, 2.3, 3.4, 0.0, 0.0, 0.0, 0.0, 0.0},
+			product: 17.6,
+		},
+		{
+			a:       embeddings[0],
+			b:       embeddings[1],
+			product: 0.13617584,
+		},
+		{
+			a:       embeddings[0],
+			b:       embeddings[2],
+			product: 0.14617061,
+		},
+		{
+			a:       embeddings[0],
+			b:       embeddings[3],
+			product: 0.13077904,
+		},
+		{
+			a:       embeddings[0],
+			b:       embeddings[4],
+			product: 0.15513652,
+		},
+		{
+			a:       embeddings[0],
+			b:       embeddings[0],
+			product: 1.0,
+		},
+		{
+			a:       embeddings[1],
+			b:       embeddings[1],
+			product: 1.0,
+		},
+		{
+			a:       embeddings[2],
+			b:       embeddings[2],
+			product: 1.0,
+		},
+		{
+			a:       embeddings[3],
+			b:       embeddings[3],
+			product: 1.0,
+		},
+		{
+			a:       embeddings[4],
+			b:       embeddings[4],
+			product: 1.0,
+		},
+	}
+
+	for i, tc := range testCases {
+		{
+			product := Dot(tc.a, tc.b)
+			if math.Abs(float64(product-tc.product)) > 1e-1 {
+				t.Errorf("%d: expected product of %f, got %f", i, tc.product, product)
+			}
+		}
+		{
+			product := DotAVX(tc.a, tc.b)
+			if math.Abs(float64(product-tc.product)) > 1e-1 {
+				t.Errorf("%d: expected product of %f, got %f", i, tc.product, product)
+			}
+		}
+	}
+}
+
 func BenchmarkCosineDistance(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		CosineDistance(embeddings[0], embeddings[1])
@@ -116,5 +199,17 @@ func BenchmarkCosineDistance(b *testing.B) {
 func BenchmarkCosineDistanceAVX(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		CosineDistanceAVX(embeddings[0], embeddings[1])
+	}
+}
+
+func BenchmarkDot(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Dot(embeddings[0], embeddings[1])
+	}
+}
+
+func BenchmarkDotAVX(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		DotAVX(embeddings[0], embeddings[1])
 	}
 }
