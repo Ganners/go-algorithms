@@ -1,7 +1,11 @@
 package lsh
 
 import (
-	"fmt"
+	"math"
+)
+
+const (
+	BucketBucketSize = 64
 )
 
 type Thing struct {
@@ -11,20 +15,16 @@ type Thing struct {
 
 type Bucket struct {
 	hyperplanes []Vector
-	things      map[string][]*Thing
+	things      [][]*Thing
 }
 
-func ComputeHash(location Vector, hyperplanes []Vector) string {
-	hash := make(Vector, len(hyperplanes))
+func ComputeHash(location Vector, hyperplanes []Vector) uint64 {
+	hash := uint64(0)
 	for i, hyperplane := range hyperplanes {
 		dist := location.Dot(hyperplane)
-		if dist >= 0 {
-			hash[i] = 1
-		} else {
-			hash[i] = 0
-		}
+		hash |= uint64(math.Float32bits(dist)&(1<<31)>>31) << i
 	}
-	return fmt.Sprintf("%v", hash)
+	return hash % BucketBucketSize
 }
 
 func NewBucket(things []*Thing, numHyperplanes int) *Bucket {
@@ -35,7 +35,7 @@ func NewBucket(things []*Thing, numHyperplanes int) *Bucket {
 	}
 	bucket := &Bucket{
 		hyperplanes: hyperplanes,
-		things:      make(map[string][]*Thing),
+		things:      make([][]*Thing, BucketBucketSize),
 	}
 	for _, thing := range things {
 		bucket.Add(thing)
@@ -46,18 +46,12 @@ func NewBucket(things []*Thing, numHyperplanes int) *Bucket {
 func (b *Bucket) Add(thing *Thing) {
 	location := thing.Location.Norm()
 	hash := ComputeHash(location, b.hyperplanes)
-	if _, ok := b.things[hash]; !ok {
-		b.things[hash] = make([]*Thing, 0, 1)
-	}
 	b.things[hash] = append(b.things[hash], thing)
 }
 
 func (b *Bucket) Get(location Vector) []*Thing {
 	hash := ComputeHash(location, b.hyperplanes)
-	if _, ok := b.things[hash]; ok {
-		return b.things[hash]
-	}
-	return nil
+	return b.things[hash]
 }
 
 // LSHIndex is a locality sensitive hashing KNN index, which uses cosine

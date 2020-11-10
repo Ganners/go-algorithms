@@ -47,7 +47,17 @@ func generateIndex(n, d int) *LSHIndex {
 	for i := 0; i < n; i++ {
 		things[i] = &Thing{Location: generateEmbedding(d)}
 	}
-	return NewLSHIndex(things, 100, 25)
+	return NewLSHIndex(things, 50, 10)
+}
+
+func BenchmarkTopK_1000_768_50(b *testing.B) {
+	n, d, k := 10000, 768, 50
+	index := generateIndex(n, d)
+	centroid := generateEmbedding(d)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		index.TopK(centroid, k)
+	}
 }
 
 func BenchmarkTopK_10000_768_50(b *testing.B) {
