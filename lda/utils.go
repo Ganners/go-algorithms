@@ -1,5 +1,7 @@
 package lda
 
+import "strings"
+
 func VecSum(a []float64) float64 {
 	sum := 0.
 	for _, v := range a {
@@ -38,4 +40,20 @@ func ArgMax(a []float64) int {
 		}
 	}
 	return maxI
+}
+
+func wordsFromDocument(document string) []string {
+	document = strings.ToLower(document)
+	document = strings.ReplaceAll(document, "\n", " ")
+	wordsRaw := strings.Split(document, " ")
+	words := make([]string, 0, len(wordsRaw))
+	for _, word := range wordsRaw {
+		if word == "" || word == " " {
+			continue
+		}
+		word = strings.TrimSpace(word)
+		words = append(words, word)
+	}
+
+	return words
 }

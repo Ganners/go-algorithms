@@ -2,138 +2,103 @@ package lda
 
 import (
 	"math/rand"
-	"strings"
 )
 
-type Document struct {
-	words       []string
-	wordClasses []int
-	classes     int
+type Corpus2 struct {
+	wordMatrix  [][]string
+	classMatrix [][]int
+	numClasses  int
+	alpha       float64
+	beta        float64
 }
 
-func (d *Document) AssignRandomClasses() {
-	d.wordClasses = make([]int, len(d.words))
-	for i := range d.wordClasses {
-		d.wordClasses[i] = rand.Intn(d.classes)
-	}
-}
+func (c *Corpus2) GibbsSample() {
+	for j := range c.wordMatrix {
+		for i := range c.wordMatrix[j] {
+			// get probabilities within current row only
+			localMask := c.FullMask()
+			c.UnmaskRow(localMask, j)
+			c.MaskEntry(localMask, j, i)
 
-func (d *Document) WordClassCounts(searchWord string) []float64 {
-	wordClassCounts := make([]float64, d.classes)
-	for i, word := range d.words {
-		if word == searchWord {
-			wordClassCounts[d.wordClasses[i]] += 1.
-		}
-	}
-	return wordClassCounts
-}
+			localClassesProba := c.Histogram(localMask)
+			VecDiv(localClassesProba, VecSum(localClassesProba))
 
-func (d *Document) WordClassProbabilities(searchWord string) []float64 {
-	filteredWordClasses := make([]int, 0)
-	for i, word := range d.words {
-		if word == searchWord {
-			filteredWordClasses = append(filteredWordClasses, d.wordClasses[i])
-		}
-	}
-	return d.classProbabilities(filteredWordClasses)
-}
+			globalMask := c.FullMask()
+			c.UnmaskWord(globalMask, c.wordMatrix[j][i])
+			c.MaskEntry(globalMask, j, i)
+			globalClassesProba := c.Histogram(globalMask)
+			VecDiv(globalClassesProba, VecSum(globalClassesProba))
 
-func (d *Document) GetClass() int {
-	classProba := d.AllClassProbabilities()
-	return ArgMax(classProba)
-}
+			VecAdd(localClassesProba, c.alpha)
+			VecAdd(globalClassesProba, c.beta)
 
-func (d *Document) AllClassProbabilities() []float64 {
-	return d.classProbabilities(d.wordClasses)
-}
+			classProbas := VecMul(localClassesProba, globalClassesProba)
 
-func (d *Document) classProbabilities(wordClasses []int) []float64 {
-	probabilities := make([]float64, d.classes)
-	inc := 1. / float64(len(wordClasses))
-	for _, class := range wordClasses {
-		probabilities[class] += inc
-	}
-	return probabilities
-}
-
-func wordsFromDocument(document string) []string {
-	document = strings.ToLower(document)
-	document = strings.ReplaceAll(document, "\n", " ")
-	wordsRaw := strings.Split(document, " ")
-	words := make([]string, 0, len(wordsRaw))
-	for _, word := range wordsRaw {
-		if word == "" || word == " " {
-			continue
-		}
-		word = strings.TrimSpace(word)
-		words = append(words, word)
-	}
-
-	return words
-}
-
-type Corpus struct {
-	documents []*Document
-	classes   int
-	alpha     float64
-	beta      float64
-}
-
-func (c Corpus) WordClassProbabilities(searchWord string) []float64 {
-	wordClassCounts := make([]float64, c.classes)
-	for _, document := range c.documents {
-		counts := document.WordClassCounts(searchWord)
-		for i := range wordClassCounts {
-			wordClassCounts[i] += counts[i]
-		}
-	}
-	VecDiv(wordClassCounts, VecSum(wordClassCounts))
-	return wordClassCounts
-}
-
-func (c Corpus) GibbsSampling() {
-	for _, document := range c.documents {
-		for j, word := range document.words {
-			// local probabilities for all words
-			localProbas := document.AllClassProbabilities()
-			outsideWordProbas := c.WordClassProbabilities(word)
-
-			VecAdd(localProbas, c.alpha)
-			VecAdd(outsideWordProbas, c.beta)
-			classProbas := VecMul(localProbas, outsideWordProbas)
-
-			// assign the best class
-			document.wordClasses[j] = ArgMax(classProbas)
+			c.classMatrix[j][i] = ArgMax(classProbas)
 		}
 	}
 }
 
-func LDA(rawDocuments []string, classes, iterations int) []int {
-	documents := make([]*Document, len(rawDocuments))
-	for i := range rawDocuments {
-		document := &Document{
-			words:   wordsFromDocument(rawDocuments[i]),
-			classes: classes,
+func (c *Corpus2) FullMask() [][]int {
+	mask := make([][]int, len(c.classMatrix))
+	for j := range mask {
+		rowMask := make([]int, len(c.classMatrix[j]))
+		for i := range rowMask {
+			rowMask[i] = 0.
 		}
-		document.AssignRandomClasses()
-		documents[i] = document
+		mask[j] = rowMask
 	}
+	return mask
+}
 
-	corpus := Corpus{
-		documents: documents,
-		classes:   classes,
-		alpha:     1e-10,
-		beta:      1e-10,
+func (c *Corpus2) UnmaskRow(mask [][]int, row int) {
+	for i := range mask[row] {
+		mask[row][i] = 1.
 	}
+}
 
-	for i := 0; i < iterations; i++ {
-		corpus.GibbsSampling()
+func (c *Corpus2) UnmaskWord(mask [][]int, searchWord string) {
+	for j := range c.wordMatrix {
+		for i, word := range c.wordMatrix[j] {
+			if word == searchWord {
+				mask[j][i] = 1.
+			}
+		}
 	}
+}
 
-	docClasses := make([]int, len(corpus.documents))
-	for i, document := range corpus.documents {
-		docClasses[i] = document.GetClass()
+func (c *Corpus2) MaskEntry(mask [][]int, j, i int) {
+	mask[j][i] = 0.
+}
+
+func (c *Corpus2) Histogram(mask [][]int) []float64 {
+	hist := make([]float64, c.numClasses)
+	for j := range c.classMatrix {
+		for i := range c.classMatrix[j] {
+			if mask[j][i] == 0 {
+				continue
+			}
+			hist[c.classMatrix[j][i]] += 1.
+		}
 	}
+	return hist
+}
 
-	return docClasses
+func NewCorpus(documents []string, numClasses int) *Corpus2 {
+	wordMatrix := make([][]string, len(documents))
+	classMatrix := make([][]int, len(documents))
+	for i, document := range documents {
+		wordMatrix[i] = wordsFromDocument(document)
+		docWordClasses := make([]int, len(wordMatrix[i]))
+		for i := range docWordClasses {
+			docWordClasses[i] = rand.Intn(numClasses)
+		}
+		classMatrix[i] = docWordClasses
+	}
+	return &Corpus2{
+		wordMatrix:  wordMatrix,
+		classMatrix: classMatrix,
+		alpha:       1e-10,
+		beta:        1e-10,
+	}
 }

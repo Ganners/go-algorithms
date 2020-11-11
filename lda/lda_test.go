@@ -1,20 +1,53 @@
 package lda
 
 import (
-	"math/rand"
 	"testing"
-	"time"
+
+	"github.com/go-test/deep"
 )
 
-func TestLDA(t *testing.T) {
-	inputDocuments := []string{
-		"ball ball ball planet galaxy",
-		"referendum planet planet referendum referendum",
-		"planet planet galaxy planet ball",
-		"planet galaxy referendum planet ball",
+func TestGibbsSampling(t *testing.T) {
+	corpus := Corpus2{
+		wordMatrix: [][]string{
+			{"ball", "ball", "ball", "planet", "galaxy"},
+			{"referendum", "planet", "planet", "referendum", "referendum"},
+			{"planet", "planet", "galaxy", "planet", "ball"},
+			{"planet", "galaxy", "referendum", "planet", "ball"},
+		},
+		classMatrix: [][]int{
+			{1, 0, 0, 2, 2},
+			{1, 2, 2, 1, 2},
+			{2, 0, 2, 1, 1},
+			{2, 0, 1, 2, 0},
+		},
+		numClasses: 3,
+		alpha:      0.01,
+		beta:       0.25,
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	classes := LDA(inputDocuments, 3, 1)
-	t.Error(classes)
+	expectedCorpus := Corpus2{
+		wordMatrix: [][]string{
+			{"ball", "ball", "ball", "planet", "galaxy"},
+			{"referendum", "planet", "planet", "referendum", "referendum"},
+			{"planet", "planet", "galaxy", "planet", "ball"},
+			{"planet", "galaxy", "referendum", "planet", "ball"},
+		},
+		classMatrix: [][]int{
+			{0, 0, 0, 2, 0},
+			{1, 2, 1, 1, 1},
+			{2, 2, 2, 2, 0},
+			{2, 2, 1, 2, 0},
+		},
+		numClasses: 3,
+		alpha:      0.01,
+		beta:       0.05,
+	}
+
+	t.Error("expected", expectedCorpus.classMatrix)
+	t.Error("actual  ", corpus.classMatrix)
+
+	deep.CompareUnexportedFields = true
+	if diff := deep.Equal(corpus, expectedCorpus); diff != nil {
+		t.Errorf("corpuses do not match: %v", diff)
+	}
 }
